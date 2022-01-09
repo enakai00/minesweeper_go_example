@@ -47,6 +47,7 @@ type environment struct {
 
 func (env environment) showField(showCursor bool) {
 	mu.Lock()
+	defer mu.Unlock()
 	for x := 0; x < env.size+2; x++ {
 		termbox.SetCell(env.originX+x*2, env.originY, '＃',
 			termbox.ColorDefault, termbox.ColorDefault)
@@ -70,12 +71,6 @@ func (env environment) showField(showCursor bool) {
 		}
 	}
 	termbox.Flush()
-	mu.Unlock()
-	message := []string{
-		"Move: [h][j][k][l], Mark: [Tab]",
-		"Open: [SPACE], Quit: [ESC]",
-	}
-	drawLines(0, env.size+3, message)
 }
 
 func (env environment) check() bool {
@@ -212,6 +207,7 @@ func timer(done <-chan struct{}) {
 
 func drawLines(x, y int, lines []string) {
 	mu.Lock()
+	defer mu.Unlock()
 	for c, str := range lines {
 		runes := []rune(str)
 		for i := 0; i < len(runes); i++ {
@@ -220,7 +216,6 @@ func drawLines(x, y int, lines []string) {
 		}
 	}
 	termbox.Flush()
-	mu.Unlock()
 }
 
 func win(env environment) {
@@ -248,6 +243,12 @@ func play(size, level int) {
 	env := newGame(size, level)
 	done := make(chan struct{})
 	go timer(done)
+
+	message := []string{
+		"Move: [h][j][k][l], Mark: [Tab]",
+		"Open: [SPACE], Quit: [ESC]",
+	}
+	drawLines(0, env.size+3, message)
 
 	for {
 		env.showField(true)
