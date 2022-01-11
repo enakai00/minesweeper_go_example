@@ -192,7 +192,7 @@ func getKey() key {
 
 func timer(done <-chan struct{}) {
 	ticker := time.NewTicker(1 * time.Second)
-    defer ticker.Stop()
+	defer ticker.Stop()
 	elapsed := 0
 	for {
 		message := []string{fmt.Sprintf("Time: %dsec", elapsed)}
